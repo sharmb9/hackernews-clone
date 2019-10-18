@@ -20,12 +20,18 @@ const list = [
   },
 ]
 
+// Higher order helper function
+const isSearched = (seacrhItem) => (item) => {
+    return item.title.toLowerCase().includes(seacrhItem.toLowerCase());
+}
+
 class App extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      list,   //same as list : list
+       //same as list : list
+      list,  
       searchTerm: ""
     };
     this.onDismiss = this.onDismiss.bind(this);
@@ -54,7 +60,7 @@ class App extends Component {
         <form>
           <input type="text" onChange={this.onSearchChange}></input>
         </form>
-        {this.state.list.map((item) => (
+        {this.state.list.filter(isSearched(this.state.searchTerm)).map((item) => (
           <div key={item.objectID}>
             <span>
               <a href={item.url}>{item.title}</a>
