@@ -20,17 +20,18 @@ const list = [
   },
 ]
 
-// Helper function to match the searched item with items in state
-const isSearched = (searchTerm) => (item) =>
-  item.title.toLowerCase().includes(searchTerm.toLowerCase())
-  
+// Higher order helper function
+const isSearched = (seacrhItem) => (item) => {
+  return item.title.toLowerCase().includes(seacrhItem.toLowerCase());
+}
 
 class App extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      list,   //same as list : list
+      //same as list : list
+      list,
       searchTerm: ""
     };
     this.onDismiss = this.onDismiss.bind(this);
@@ -52,16 +53,36 @@ class App extends Component {
   }
 
   render() {
+    const { searchTerm, list } = this.state; //deconstructing the state
     const heading = "Hacker News clone"
-    const {searchTerm, list} = this.state; //deconstructing the state
     return (
       <div className="App">
         <h1>{heading}</h1>
-        <form>
-          <input type="text" onChange={this.onSearchChange} value = {searchTerm}></input>
-        </form>
+        <Search value = {searchTerm} onChange = {this.onSearchChange}  />Search
+        <Table heading = {heading} list ={list} pattern = {searchTerm} onDismiss = {this.onDismiss}/>
+      </div>
+    )
+  }
+}
 
-        {this.state.list.filter(isSearched( searchTerm)).map((item) => (
+class Search extends Component {
+  render() {
+    const { value, onChange, children} = this.props;
+    return (
+      <form>
+        {children} < input type="text" value={value} onChange={onChange} />
+      </form>
+    )
+  }
+}
+
+class Table extends Component {
+  render() {
+    const { list, pattern, onDismiss} = this.props;
+    return (
+      
+      <div>
+        {list.filter(isSearched(pattern)).map(item =>
           <div key={item.objectID}>
             <span>
               <a href={item.url}>{item.title}</a>
@@ -70,15 +91,14 @@ class App extends Component {
             <span>{item.num_comments}</span>
             <span>{item.objectID}</span>
             <span>
-              <button onClick={() => this.onDismiss(item.objectID)} type="button">
+              <button onClick={() => onDismiss(item.objectID)} type="button">
                 Dismiss
               </button>
             </span>
           </div>
-        ))}
-
+        )}
       </div>
-    )
+    );
   }
 }
 
