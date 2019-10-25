@@ -20,6 +20,11 @@ const list = [
   },
 ]
 
+// Helper function to match the searched item with items in state
+const isSearched = (searchTerm) => (item) =>
+  item.title.toLowerCase().includes(searchTerm.toLowerCase())
+  
+
 class App extends Component {
 
   constructor(props) {
@@ -48,13 +53,15 @@ class App extends Component {
 
   render() {
     const heading = "Hacker News clone"
+    const {searchTerm, list} = this.state; //deconstructing the state
     return (
       <div className="App">
         <h1>{heading}</h1>
         <form>
-          <input type="text" onChange={this.onSearchChange}></input>
+          <input type="text" onChange={this.onSearchChange} value = {searchTerm}></input>
         </form>
-        {this.state.list.map((item) => (
+
+        {this.state.list.filter(isSearched( searchTerm)).map((item) => (
           <div key={item.objectID}>
             <span>
               <a href={item.url}>{item.title}</a>
@@ -69,6 +76,7 @@ class App extends Component {
             </span>
           </div>
         ))}
+
       </div>
     )
   }
