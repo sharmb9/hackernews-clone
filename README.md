@@ -2,17 +2,6 @@
 
 A HackerNews Client clone made with React
 
-## Getting Started
-
-### Prerequisites
-
-Android Studio to run and install the application. User can install the application on an android device or can set up an emulator in android studio.
-
-### Installing
-
-Clone the zip file and import it in android studio. Install the app on an android device or run it in an emulator from within android studio.
-
-
 ## Available Scripts
 
 In the project directory, you can run:
