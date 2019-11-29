@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 
+// Defining a couple of constants for API query
 const DEFAULT_QUERY = 'redux';
 const PATH_BASE = 'https://hn.algolia.com/api/v1';
 const PATH_SEARCH = '/search';
@@ -40,6 +41,7 @@ class App extends Component {
 
     };
 
+    // Binding this to functions
     this.setSearchTopStories = this.setSearchTopStories.bind(this);
     this.onDismiss = this.onDismiss.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
@@ -48,37 +50,42 @@ class App extends Component {
 
 
   setSearchTopStories(result) {
-    this.setState({ result });
-    }
+    this.setState({ result }); // result:result
+  }
 
-    componentDidMount() {
+  componentDidMount() {
     const { searchTerm } = this.state;
+    // Using the fetch native API to get results from hacker-news api
     fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`)
-    .then(response => response.json())
-    .then(result => this.setSearchTopStories(result))
-    .catch(error => error);
-    }
-    
+      .then(response => response.json())
+      .then(result => this.setSearchTopStories(result))
+      .catch(error => error);
+  }
 
+  // updating searchTerm state whenever input form gets  a keyword
   onSearchChange(event) {
     this.setState({
       searchTerm: event.target.value
     })
   }
 
+  // updates the list state by filtering out the objectID of dismissed object
   onDismiss(id) {
-    const updatedList = this.state.list.filter((item) => item.objectID !== id)
+    const isNotId = (item) => item.objectID !== id;
+    const updatedList = this.state.result.hits.filter(isNotId);
     this.setState({
-      list: updatedList
-    }
-    )
+      //list: updatedList, this wont update the results fetched from hackernews api 
+      result: { ...this.state, hits: updatedList }
+    })
   }
 
+
+  //Renders the app
   render() {
     const { searchTerm, result } = this.state; //deconstructing the state
     const heading = "Hacker News clone"
 
-    if(!result){return null; }
+    if (!result) { return null; }
 
     return (
 
@@ -95,6 +102,7 @@ class App extends Component {
   }
 }
 
+// Search component
 //same as const Search = () => { return ()}
 const Search = ({ value, onChange, children }) => (
   <form>
@@ -102,6 +110,7 @@ const Search = ({ value, onChange, children }) => (
   </form>
 )
 
+// Table component
 const Table = ({ list, pattern, onDismiss }) => {
 
   const largeColumn = { width: '40%', };
@@ -125,6 +134,9 @@ const Table = ({ list, pattern, onDismiss }) => {
             {item.num_points}
           </span>
           <span style={smallColumn}>
+            {item.objectID}
+          </span>
+          <span style={smallColumn}>
             <Button className="button-inline" onClick={() => onDismiss(item.objectID)}>
               Dismiss
         </Button>
@@ -137,7 +149,7 @@ const Table = ({ list, pattern, onDismiss }) => {
 
 }
 
-
+// Button component
 const Button = ({ onClick, className, children }) => (
 
   <button onClick={onClick} className={className} type="button" >
