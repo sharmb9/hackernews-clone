@@ -26,9 +26,9 @@ const PARAM_SEARCH = 'query=';
 // ]
 
 // Higher order helper function
-const isSearched = (seacrhItem) => (item) => {
-  return item.title.toLowerCase().includes(seacrhItem.toLowerCase());
-}
+// const isSearched = (seacrhItem) => (item) => {
+//   return item.title.toLowerCase().includes(seacrhItem.toLowerCase());
+// }
 
 class App extends Component {
 
@@ -43,8 +43,10 @@ class App extends Component {
 
     // Binding 'this' to functions
     this.setSearchTopStories = this.setSearchTopStories.bind(this);
+    this.fetchSearchTopStories = this.fetchSearchTopStories.bind(this);
     this.onDismiss = this.onDismiss.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
+    this.onSearchSubmit = this.onSearchSubmit.bind(this);
 
 
   }
@@ -54,14 +56,18 @@ class App extends Component {
     this.setState({ result }); // result:result
   }
 
-  // fetches results from the api after the components  have mounted
-  componentDidMount() {
-    const { searchTerm } = this.state;
-    // Using the fetch native API to get results from hacker-news api
+  fetchSearchTopStories(searchTerm){
     fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`)
       .then(response => response.json())
       .then(result => this.setSearchTopStories(result))
       .catch(error => error);
+  }
+
+  // fetches results from the api after the components  have mounted
+  componentDidMount() {
+    const { searchTerm } = this.state;
+    // Using the fetch native API to get results from hacker-news api
+    this.fetchSearchTopStories(searchTerm);
   }
 
   // updating searchTerm state whenever input form gets  a keyword
@@ -69,6 +75,12 @@ class App extends Component {
     this.setState({
       searchTerm: event.target.value
     })
+  }
+
+  onSearchSubmit(event){
+    this.fetchSearchTopStories(this.state.searchTerm);
+    //prevents  refreshing the page after each search
+    event.preventDefault();
   }
 
   // updates the list state by filtering out the objectID of dismissed object
@@ -94,11 +106,12 @@ class App extends Component {
       <div className="page">
         <div className="interactions">
           <h1>{heading}</h1>
-          <Search value={searchTerm} onChange={this.onSearchChange} >
+          <Search value={searchTerm} onChange={this.onSearchChange} onSubmit={this.onSearchSubmit} >
             Search
           </Search>
         </div>
-        <Table heading={heading} list={result.hits} pattern={searchTerm} onDismiss={this.onDismiss} />
+        {/* pattern={searchTerm}  */}
+        <Table heading={heading} list={result.hits} onDismiss={this.onDismiss} />
       </div>
     )
   }
@@ -106,14 +119,17 @@ class App extends Component {
 
 // Search component
 //same as const Search = () => { return ()}
-const Search = ({ value, onChange, children }) => (
-  <form>
+const Search = ({ value, onChange, onSubmit, children }) => (
+  <form onSubmit = {onSubmit}>
     {children} < input type="text" value={value} onChange={onChange} />
+    <button type= "submit">{children}</button>
   </form>
+  
 )
 
 // Table component
-const Table = ({ list, pattern, onDismiss }) => {
+// pattern
+const Table = ({ list, onDismiss }) => {
 
   const largeColumn = { width: '40%', };
   const midColumn = { width: '30%', };
@@ -121,7 +137,8 @@ const Table = ({ list, pattern, onDismiss }) => {
 
   return (
     <div className="table">
-      {list.filter(isSearched(pattern)).map((item) =>
+      {/* filter(isSearched(pattern)) */}
+      {list.map((item) =>
         <div key={item.objectID} className="table-row">
           <span style={largeColumn}>
             <a href={item.url}>{item.title}</a>
