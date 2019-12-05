@@ -41,18 +41,20 @@ class App extends Component {
 
     };
 
-    // Binding this to functions
+    // Binding 'this' to functions
     this.setSearchTopStories = this.setSearchTopStories.bind(this);
     this.onDismiss = this.onDismiss.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
 
+
   }
 
-
+  // sets result state to the term being searched
   setSearchTopStories(result) {
     this.setState({ result }); // result:result
   }
 
+  // fetches results from the api after the components  have mounted
   componentDidMount() {
     const { searchTerm } = this.state;
     // Using the fetch native API to get results from hacker-news api
